@@ -3,4 +3,6 @@ export interface User {
   githubLogin: string;
   name: string;
   avatarUrl: string;
+  email: string;
+  
 }

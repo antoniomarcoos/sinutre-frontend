@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { GithubLogo } from '@phosphor-icons/react';
+import { GithubLogo, GoogleLogo } from '@phosphor-icons/react';
 import { API_URL } from '@/lib/api';
 
 // Cores extraídas do SVG do protótipo
@@ -10,6 +10,10 @@ const TEXT_MUTED = '#727272';
 
 function startGithubLogin() {
   window.location.href = `${API_URL}/auth/github`;
+}
+
+function startGoogleLogin() {
+  window.location.href = `${API_URL}/auth/google`;
 }
 
 export function LoginPage() {
@@ -122,19 +126,33 @@ function WelcomeBlock() {
         Bem-vindo(a)!
       </h2>
       <p className="text-base lg:text-lg" style={{ color: TEXT_MUTED }}>
-        Faça login com seu Github
+        Escolha como deseja acessar
         <br />
-        para começar.
+        sua conta.
       </p>
-      <button
-        type="button"
-        onClick={startGithubLogin}
-        className="inline-flex items-center gap-2.5 rounded-xl px-6 py-3 text-white font-medium shadow-md transition-colors cursor-pointer"
-        style={{ backgroundColor: TEXT_DARK }}
-      >
-        <GithubLogo size={22} weight="fill" />
-        Entrar com Github
-      </button>
+      
+      {/* Container flex para empilhar os botões e deixá-los com a mesma largura */}
+      <div className="flex flex-col gap-3 w-full max-w-[260px]">
+        <button
+          type="button"
+          onClick={startGithubLogin}
+          className="inline-flex items-center justify-center gap-2.5 rounded-xl px-6 py-3 text-white font-medium shadow-md transition-colors cursor-pointer"
+          style={{ backgroundColor: TEXT_DARK }}
+        >
+          <GithubLogo size={22} weight="fill" />
+          Entrar com Github
+        </button>
+
+        <button
+          type="button"
+          onClick={startGoogleLogin}
+          className="inline-flex items-center justify-center gap-2.5 rounded-xl px-6 py-3 text-white font-medium shadow-md transition-colors cursor-pointer"
+          style={{ backgroundColor: TEXT_DARK }}
+        >
+          <GoogleLogo size={22} weight="fill" />
+          Entrar com Google
+        </button>
+      </div>
     </div>
   );
 }

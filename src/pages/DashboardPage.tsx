@@ -10,6 +10,7 @@ import { AddMealModal } from '@/components/modal/AddMealModal';
 import { useAuth } from '@/context/AuthContext';
 import { Meal } from '@/types/mealSummary';
 import { api } from '@/lib/api';
+import { SignOut } from '@phosphor-icons/react';
 
 import {
   //MACRO_SUMMARY,
@@ -39,6 +40,11 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
 
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
+
+  function handleLogout() {
+    localStorage.removeItem('sinutre.token'); 
+    window.location.href = '/';
+  }
 
   async function loadMeals() {
     try {
@@ -125,6 +131,17 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
   return (
     <>
       <div className="flex flex-col gap-6 w-full max-w-[1200px] mx-auto mb-8">
+
+        <div className="flex justify-end px-4 mt-4">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-red-500 hover:text-red-700 font-medium transition-colors cursor-pointer"
+          >
+            <SignOut size={20} weight="bold" />
+            Sair
+          </button>
+        </div>
+      
         <Header
           drawerId={drawerId}
           userName={user.name}
