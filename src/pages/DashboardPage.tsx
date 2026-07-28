@@ -10,26 +10,13 @@ import { AddMealModal } from '@/components/modal/AddMealModal';
 import { useAuth } from '@/context/AuthContext';
 import { Meal } from '@/types/mealSummary';
 import { api } from '@/lib/api';
-import { SignOut } from '@phosphor-icons/react';
-
-import {
-  //MACRO_SUMMARY,
-  //MEALS_SUMMARY,
-  // RECENT_MEALS,
-  // SAMPLE_MEAL_ITEMS,
-} from '@/data/mockData';
 import { useMealModal } from '@/hooks/useMealModal';
+import { DeleteConfirmationModal } from '@/components/modal/DeleteConfirmationModal';
+import { ViewMealModal } from '@/components/modal/ViewMealModal';
 
 interface DashboardPageProps {
   drawerId: string;
 }
-
-//const MODAL_MACROS = {
-//  carbs: 0,
-//  proteins: 0,
-//  fats: 0,
-//  calories: 0,
-//};
 
 export function DashboardPage({ drawerId }: DashboardPageProps) {
   const { user } = useAuth();
@@ -40,11 +27,9 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
 
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
-
-  function handleLogout() {
-    localStorage.removeItem('sinutre.token'); 
-    window.location.href = '/';
-  }
+  const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
+  const [modalType, setModalType] = useState<'view' | 'edit' | 'delete' | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   async function loadMeals() {
     try {
@@ -58,6 +43,40 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
   useEffect(() => {
     loadMeals();
   }, []);
+
+  const handleView = (meal: Meal) => {
+    setSelectedMeal(meal);
+    setModalType('view');
+  };
+
+  const handleEdit = (meal: Meal) => {
+    setSelectedMeal(meal);
+    setModalType('edit');
+  };
+
+  const handleDelete = (meal: Meal) => {
+    setSelectedMeal(meal);
+    setModalType('delete');
+  };
+
+  const closeModal = () => {
+    setSelectedMeal(null);
+    setModalType(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedMeal) return;
+    setDeleteLoading(true);
+    try {
+      await api.delete(`/meals/${selectedMeal.id}`);
+      await loadMeals();
+      closeModal();
+    } catch (error) {
+      alert('Erro ao excluir a refeição.');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   const mealsSummary = useMemo(() => {
     const today = new Date();
@@ -114,11 +133,10 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         fats: 0,
         calories: 0,
 
-        caloriesGoal: 1000, //ainda não veio do banco de dados
+        caloriesGoal: 1000,
       },
     );
   }, [meals]);
-
 
   if (loading) {
     return (
@@ -131,17 +149,6 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
   return (
     <>
       <div className="flex flex-col gap-6 w-full max-w-[1200px] mx-auto mb-8">
-
-        <div className="flex justify-end px-4 mt-4">
-          <button 
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-red-500 hover:text-red-700 font-medium transition-colors cursor-pointer"
-          >
-            <SignOut size={20} weight="bold" />
-            Sair
-          </button>
-        </div>
-      
         <Header
           drawerId={drawerId}
           userName={user.name}
@@ -155,8 +162,18 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
           <AddMealCard onSelectCategory={modal.openWith} />
         </div>
 
-        <MealsTable meals={meals} />
-        <MealsList meals={meals} />
+        <MealsTable 
+          meals={meals}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+        <MealsList 
+          meals={meals}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       </div>
 
       <MealFab onSelectCategory={modal.openWith} />
@@ -168,6 +185,36 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         onSave={modal.close}
         onMealCreated={loadMeals}
       />
+
+      {modalType === 'delete' && selectedMeal && (
+        <DeleteConfirmationModal
+          meal={selectedMeal}
+          onConfirm={confirmDelete}
+          onCancel={closeModal}
+          loading={deleteLoading}
+        />
+      )}
+
+      {modalType === 'view' && selectedMeal && (
+        <ViewMealModal
+          meal={selectedMeal}
+          onClose={closeModal}
+        />
+      )}
+
+      {modalType === 'edit' && selectedMeal && (
+        <AddMealModal
+          open={true}
+          typeMeal={selectedMeal.type}
+          onClose={closeModal}
+          onSave={() => {
+            loadMeals();
+            closeModal();
+          }}
+          onMealCreated={loadMeals}
+          editingMeal={selectedMeal}
+        />
+      )}
     </>
   );
 }

@@ -5,7 +5,6 @@ export async function createMeal(
     type: string;
     eatTime: string;
     description?: string;
-
     items: {
       foodId: number;
       grams: number;
@@ -13,4 +12,19 @@ export async function createMeal(
   },
 ) {
   return api.post('/meals', meal);
+}
+
+export async function updateMeal(
+  id: string,
+  meal: {
+    type: string;
+    eatTime: string;
+    description?: string;
+    items: {
+      foodId: number;
+      grams: number;
+    }[];
+  },
+) {
+  return api.put(`/meals/${id}`, meal);
 }

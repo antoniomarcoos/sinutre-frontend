@@ -12,6 +12,7 @@ interface AuthContextData {
   user: User | null;
   loading: boolean;
   refreshUser: () => Promise<void>;
+  signOut: () => void;
 }
 
 const AuthContext =
@@ -42,6 +43,12 @@ export function AuthProvider({
     }
   }
 
+  function signOut() {
+    localStorage.removeItem('sinutre.token');
+    setUser(null);
+    window.location.href = '/login';
+  }
+
   useEffect(() => {
     refreshUser().finally(() =>
       setLoading(false),
@@ -54,6 +61,7 @@ export function AuthProvider({
         user,
         loading,
         refreshUser,
+        signOut,
       }}
     >
       {children}

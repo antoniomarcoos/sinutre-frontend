@@ -3,10 +3,12 @@ import { MealsTableRow } from './MealsTableRow';
 
 interface MealsTableProps {
   meals: Meal[];
-  onActionClick?: (meal: Meal) => void;
+  onView?: (meal: Meal) => void;
+  onEdit?: (meal: Meal) => void;
+  onDelete?: (meal: Meal) => void;
 }
 
-export function MealsTable({ meals, onActionClick }: MealsTableProps) {
+export function MealsTable({ meals, onView, onEdit, onDelete }: MealsTableProps) {
   
   return (
     <section className="card bg-base-100 shadow-sm w-full hidden lg:block">
@@ -23,11 +25,14 @@ export function MealsTable({ meals, onActionClick }: MealsTableProps) {
             </tr>
           </thead>
           <tbody>
-            {meals.map(meal => (
+            {meals.map((meal, index) => (
               <MealsTableRow
                 key={meal.id}
                 meal={meal}
-                onActionClick={onActionClick}
+                displayId={meals.length - index}
+                onView={onView}
+                onEdit={onEdit}
+                onDelete={onDelete}
               />
             ))}
           </tbody>
