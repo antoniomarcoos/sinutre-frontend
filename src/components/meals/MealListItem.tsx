@@ -6,13 +6,12 @@ import { formatCalories } from '@/utils/format';
 
 interface MealListItemProps {
   meal: Meal;
-  onActionClick?: (meal: Meal) => void;
   onView?: (meal: Meal) => void;
   onEdit?: (meal: Meal) => void;
   onDelete?: (meal: Meal) => void;
 }
 
-export function MealListItem({ meal, onActionClick, onView, onEdit, onDelete }: MealListItemProps) {
+export function MealListItem({ meal, onView, onEdit, onDelete }: MealListItemProps) {
   const category = MEAL_CATEGORY_BY_ID[meal.type];
   const Icon = category?.Icon || (() => null);
   const categoryLabel = category?.label || meal.type || 'Outra';
