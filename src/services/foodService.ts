@@ -8,6 +8,13 @@ export async function getFoods(search?: string) {
   return response.data;
 }
 
+export async function getAllFoods(search: string) {
+  const response = await api.get<Food[]>('/foods/all', {
+    params: { search },
+  });
+  return response.data;
+}
+
 export async function createFood(
   food: Omit<Food, 'id'>,
 ) {
