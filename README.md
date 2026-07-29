@@ -13,6 +13,13 @@ v5 como plugin) e a UI foi quebrada em componentes reutilizáveis.
 - CRUD completo de alimentos
 - Busca de alimentos com sugestões da TACO
 - Calculadoras de IMC, gasto calórico e nutricional
+- Sugestão de refeições com IA (Gemini) - *experimental*
+- Página de progresso com gráficos
+- Consumo de água com meta personalizada
+- Edição de perfil e metas do usuário
+- Tema escuro/claro
+- Favoritar alimentos
+- Exportação de dados em CSV e PDF
 - Feedback visual com toasts
 
 ## Stack
@@ -23,6 +30,8 @@ v5 como plugin) e a UI foi quebrada em componentes reutilizáveis.
 - @phosphor-icons/react para os ícones
 - ESLint 9 (flat config) + typescript-eslint
 - react-hot-toast para notificações
+- recharts para gráficos
+- @google/generative-ai para IA
 
 ## Estrutura
 
@@ -31,17 +40,22 @@ src/
 │   ├── calculadoras/  # IMCCalculator, GastoCaloricoCalculator, CalculadoraNutricional
 │   ├── cards/         # AddMealCard, TotalMealsCard
 │   ├── forms/         # FormField
+│   ├── ia/            # RefeicaoSugestao
 │   ├── layout/        # Sidebar, SidebarBrand, SidebarItem, Header
 │   ├── macros/        # MacroStat, MacroStatsBar
-│   ├── meals/         # MealActionButton, MealFab, MealsList/Table
-│   └── modal/         # AddMealModal, EditFoodModal, DeleteConfirmationModal, ViewMealModal
+│   ├── meals/         # MealActionButton, MealFab, MealsList/Table, MealFilters
+│   ├── modal/         # AddMealModal, EditFoodModal, DeleteConfirmationModal, ViewMealModal
+│   ├── profile/       # EditProfileModal
+│   └── water/         # WaterCard
 ├── constants/         # MEAL_CATEGORIES, NAV_ITEMS
-├── data/              # mocks de usuário, macros e refeições
+├── context/           # AuthContext, ThemeContext
+├── data/              # mocks
 ├── hooks/             # useMealModal
-├── pages/             # DashboardPage, DietFoodPage, CalculadorasPage
+├── pages/             # DashboardPage, DietFoodPage, CalculadorasPage, ProgressPage, SettingsPage
+├── services/          # api, foodService, mealService, ia.service
 ├── styles/            # tailwind + tema sinutre
 ├── types/             # tipos de domínio
-├── utils/             # funções auxiliares (format)
+├── utils/             # funções auxiliares (format, date)
 ├── App.tsx
 └── main.tsx
 
