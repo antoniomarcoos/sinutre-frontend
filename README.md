@@ -9,9 +9,10 @@ v5 como plugin) e a UI foi quebrada em componentes reutilizáveis.
 
 - Autenticação via GitHub e Google OAuth
 - Dashboard com resumo de refeições e macros
-- CRUD completo de refeições (criar, listar, visualizar, editar, excluir)
-- CRUD completo de alimentos (criar, listar, editar, excluir)
+- CRUD completo de refeições
+- CRUD completo de alimentos
 - Busca de alimentos com sugestões da TACO
+- Calculadoras de IMC, gasto calórico e nutricional
 - Feedback visual com toasts
 
 ## Stack
@@ -25,25 +26,24 @@ v5 como plugin) e a UI foi quebrada em componentes reutilizáveis.
 
 ## Estrutura
 
-```
 src/
 ├── components/
-│   ├── cards/      # AddMealCard, TotalMealsCard
-│   ├── forms/      # FormField
-│   ├── layout/     # Sidebar, SidebarBrand, SidebarItem, Header
-│   ├── macros/     # MacroStat, MacroStatsBar
-│   ├── meals/      # MealActionButton, MealFab, MealsList/Table…
-│   └── modal/      # AddMealModal, EditFoodModal, DeleteConfirmationModal, ViewMealModal
-├── constants/      # MEAL_CATEGORIES, NAV_ITEMS
-├── data/           # mocks de usuário, macros e refeições
-├── hooks/          # useMealModal
-├── pages/          # DashboardPage, DietFoodPage
-├── styles/         # tailwind + tema sinutre
-├── types/          # tipos de domínio
-├── utils/          # funções auxiliares (format)
+│   ├── calculadoras/  # IMCCalculator, GastoCaloricoCalculator, CalculadoraNutricional
+│   ├── cards/         # AddMealCard, TotalMealsCard
+│   ├── forms/         # FormField
+│   ├── layout/        # Sidebar, SidebarBrand, SidebarItem, Header
+│   ├── macros/        # MacroStat, MacroStatsBar
+│   ├── meals/         # MealActionButton, MealFab, MealsList/Table
+│   └── modal/         # AddMealModal, EditFoodModal, DeleteConfirmationModal, ViewMealModal
+├── constants/         # MEAL_CATEGORIES, NAV_ITEMS
+├── data/              # mocks de usuário, macros e refeições
+├── hooks/             # useMealModal
+├── pages/             # DashboardPage, DietFoodPage, CalculadorasPage
+├── styles/            # tailwind + tema sinutre
+├── types/             # tipos de domínio
+├── utils/             # funções auxiliares (format)
 ├── App.tsx
 └── main.tsx
-```
 
 ## Scripts
 
