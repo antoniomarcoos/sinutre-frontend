@@ -1,4 +1,5 @@
 import type { FoodItem } from '@/types/meal';
+import { formatMacro } from '@/utils/format';
 
 interface MealItemsTableProps {
   items: FoodItem[];
@@ -27,12 +28,12 @@ export function MealItemsTable({ items, onRemove }: MealItemsTableProps) {
               <td>{item.grams} g</td>
               <td>
                 <span className="badge badge-outline badge-primary">
-                  {item.calories} kcal
+                  {formatMacro(item.calories)} kcal
                 </span>
               </td>
-              <td>{item.carbs} g</td>
-              <td>{item.protein} g</td>
-              <td>{item.fat} g</td>
+              <td>{formatMacro(item.carbs)} g</td>
+              <td>{formatMacro(item.protein)} g</td>
+              <td>{formatMacro(item.fat)} g</td>
               <td>
                 <button
                   type="button"

@@ -1,6 +1,7 @@
 import { Meal } from "@/types/mealSummary";
 import { MEAL_CATEGORY_BY_ID } from '@/constants/mealCategories';
 import { formatDate } from '@/utils/date';
+import { formatMacro } from '@/utils/format';
 
 interface ViewMealModalProps {
   meal: Meal;
@@ -33,21 +34,21 @@ export function ViewMealModal({ meal, onClose }: ViewMealModalProps) {
           
           <div className="flex justify-between border-b border-base-300 pb-2">
             <span className="text-base-content/60">Calorias</span>
-            <span className="font-semibold">{meal.totals.calories} kcal</span>
+            <span className="font-semibold">{formatMacro(meal.totals.calories)} kcal</span>
           </div>
           
           <div className="grid grid-cols-3 gap-2 mt-2">
             <div className="text-center p-2 bg-base-200 rounded">
               <div className="text-xs text-base-content/60">Carboidratos</div>
-              <div className="font-semibold">{meal.totals.carbs}g</div>
+              <div className="font-semibold">{formatMacro(meal.totals.carbs)}g</div>
             </div>
             <div className="text-center p-2 bg-base-200 rounded">
               <div className="text-xs text-base-content/60">Proteínas</div>
-              <div className="font-semibold">{meal.totals.proteins}g</div>
+              <div className="font-semibold">{formatMacro(meal.totals.proteins)}g</div>
             </div>
             <div className="text-center p-2 bg-base-200 rounded">
               <div className="text-xs text-base-content/60">Gorduras</div>
-              <div className="font-semibold">{meal.totals.fats}g</div>
+              <div className="font-semibold">{formatMacro(meal.totals.fats)}g</div>
             </div>
           </div>
         </div>

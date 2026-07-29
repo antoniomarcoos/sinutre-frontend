@@ -2,6 +2,7 @@ import { DotsThree, Eye, Pencil, Trash } from '@phosphor-icons/react';
 import { MEAL_CATEGORY_BY_ID } from '@/constants/mealCategories';
 import type { Meal } from '@/types/mealSummary';
 import { formatDate } from '@/utils/date';
+import { formatCalories, formatMacro } from '@/utils/format';
 
 interface MealsTableRowProps {
   meal: Meal;
@@ -28,11 +29,10 @@ export function MealsTableRow({
       <td className="font-semibold">{category.label}</td>
       <td>
         <span className="badge badge-primary badge-outline">
-          {meal.totals.calories} kcal
+          {formatCalories(meal.totals.calories)} kcal
         </span>
       </td>
       <td className="text-center">
-        {/* Usando a estrutura nativa do DaisyUI para dropdown funcionar redondo */}
         <div className="dropdown dropdown-end">
           <button
             type="button"

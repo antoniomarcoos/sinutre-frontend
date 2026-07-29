@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import type { FoodItem } from '@/types/meal';
 import { MealItemForm } from './MealItemForm';
 import { MealItemsTable } from './MealItemsTable';
@@ -86,6 +87,16 @@ export function AddMealModal({
   }
 
   async function handleSaveMeal() {
+    if (!meal.eatTime) {
+      toast.error('Selecione uma data e horário');
+      return;
+    }
+
+    if (items.length === 0) {
+      toast.error('Adicione pelo menos um item à refeição');
+      return;
+    }
+
     const data = {
       ...meal,
       items: items.map((item) => ({
@@ -94,14 +105,23 @@ export function AddMealModal({
       })),
     };
 
-    if (editingMeal) {
-      await updateMeal(editingMeal.id, data);
-    } else {
-      await createMeal(data);
-    }
+    try {
+      if (editingMeal) {
+        await updateMeal(editingMeal.id, data);
+      } else {
+        await createMeal(data);
+      }
 
-    await onMealCreated();
-    onClose();
+      toast.success('Refeição salva com sucesso!');
+      await onMealCreated();
+      onClose();
+    } catch (error: any) {
+      if (error.response?.status === 400) {
+        toast.error('Data inválida. Selecione uma data e horário válidos.');
+      } else {
+        toast.error('Erro ao salvar refeição');
+      }
+    }
   }
 
   const macros = useMemo(

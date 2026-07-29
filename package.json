@@ -8,12 +8,13 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
-  }, 
+  },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",
     "axios": "^1.17.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.18.0"
   },
   "devDependencies": {

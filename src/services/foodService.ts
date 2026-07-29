@@ -1,31 +1,36 @@
 import { api } from '@/lib/api';
 import { Food } from '@/types/food';
 
-export async function getFoods() {
-  const response = await api.get<Food[]>('/foods');
+export async function getFoods(search?: string) {
+  const response = await api.get<Food[]>('/foods', {
+    params: search ? { search } : {},
+  });
   return response.data;
 }
 
 export async function createFood(
   food: Omit<Food, 'id'>,
 ) {
-  const response = await api.post(
-    '/foods',
-    food,
-  );
-
+  const response = await api.post('/foods', food);
   return response.data;
 }
 
-export async function searchFoods(
-  search: string,
-) {
-  const response = await api.get('/foods', {
-    params: {
-      search,
-    },
+export async function searchFoods(search: string) {
+  const response = await api.get('/foods/suggest', {
+    params: { q: search },
   });
+  return response.data;
+}
 
- return response.data;
+export async function updateFood(
+  id: string,
+  food: Omit<Food, 'id'>,
+) {
+  const response = await api.put(`/foods/${id}`, food);
+  return response.data;
+}
 
+export async function deleteFood(id: string) {
+  const response = await api.delete(`/foods/${id}`);
+  return response.data;
 }

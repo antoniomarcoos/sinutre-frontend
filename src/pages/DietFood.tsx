@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash } from '@phosphor-icons/react';
+import { Plus, Trash, Pencil } from '@phosphor-icons/react';
+import toast from 'react-hot-toast';
 
 import { SimpleHeader } from '@/components/layout/SimpleHeader';
 import { AddFoodModal } from '@/components/modal/AddFoodModal';
+import { EditFoodModal } from '@/components/modal/EditFoodModal';
 
 import { getFoods } from '@/services/foodService';
 import { api } from '@/lib/api';
 import type { Food } from '@/types/food';
+import { formatMacro } from '@/utils/format';
 
 const MODAL_ID = 'create-food-modal';
 const DELETE_MODAL_ID = 'delete-food-modal';
@@ -15,6 +18,7 @@ export function DietFoodPage() {
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
   const [foodToDelete, setFoodToDelete] = useState<string | number | null>(null);
+  const [foodToEdit, setFoodToEdit] = useState<Food | null>(null);
 
   async function loadFoods() {
     try {
@@ -37,14 +41,24 @@ export function DietFoodPage() {
     modal?.close();
   }
 
+  function openEditModal(food: Food) {
+    setFoodToEdit(food);
+  }
+
+  function closeEditModal() {
+    setFoodToEdit(null);
+  }
+
   async function handleDelete() {
     if (!foodToDelete) return;
     
     try {
       await api.delete(`/foods/${foodToDelete}`);
+      toast.success('Alimento excluído com sucesso');
       loadFoods();
       closeDeleteModal();
     } catch (error) {
+      toast.error('Erro ao excluir alimento');
       console.error(error);
     }
   }
@@ -74,29 +88,34 @@ export function DietFoodPage() {
                   <h2 className="card-title">
                     {food.name}
                   </h2>
-                  <button
-                    onClick={() => openDeleteModal(food.id)}
-                    className="btn btn-ghost btn-sm btn-square text-red-500 hover:bg-red-50 hover:text-red-700"
-                  >
-                    <Trash size={20} weight="bold" />
-                  </button>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => openEditModal(food)}
+                      className="btn btn-ghost btn-sm btn-square text-blue-500 hover:bg-blue-50 hover:text-blue-700"
+                    >
+                      <Pencil size={20} weight="bold" />
+                    </button>
+                    <button
+                      onClick={() => openDeleteModal(food.id)}
+                      className="btn btn-ghost btn-sm btn-square text-red-500 hover:bg-red-50 hover:text-red-700"
+                    >
+                      <Trash size={20} weight="bold" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-2">
                   <span>
-                    🔥 {food.caloriesPer100g} kcal
+                    🔥 {formatMacro(food.caloriesPer100g)} kcal
                   </span>
-
                   <span>
-                    🍞 {food.carbsPer100g} g
+                    🍞 {formatMacro(food.carbsPer100g)} g
                   </span>
-
                   <span>
-                    🍗 {food.proteinPer100g} g
+                    🍗 {formatMacro(food.proteinPer100g)} g
                   </span>
-
                   <span>
-                    🥑 {food.fatPer100g} g
+                    🥑 {formatMacro(food.fatPer100g)} g
                   </span>
                 </div>
               </div>
@@ -140,6 +159,12 @@ export function DietFoodPage() {
           <button onClick={closeDeleteModal}>fechar</button>
         </form>
       </dialog>
+
+      <EditFoodModal
+        food={foodToEdit}
+        onUpdated={loadFoods}
+        onClose={closeEditModal}
+      />
     </div>
   );
 }
