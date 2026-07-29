@@ -66,7 +66,7 @@ export function CalculadoraNutricional({ defaultWeight = '', defaultHeight = '' 
 
   function calcularMetas(): Metas {
     const pesoNum = Number(peso) || 70;
-    const alturaNum = Number(altura) || 175;
+    const _alturaNum = Number(altura) || 175;
 
     switch (profile) {
       case 'atleta':

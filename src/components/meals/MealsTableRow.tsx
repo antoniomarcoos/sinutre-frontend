@@ -2,7 +2,7 @@ import { DotsThree, Eye, Pencil, Trash } from '@phosphor-icons/react';
 import { MEAL_CATEGORY_BY_ID } from '@/constants/mealCategories';
 import type { Meal } from '@/types/mealSummary';
 import { formatDate } from '@/utils/date';
-import { formatCalories, formatMacro } from '@/utils/format';
+import { formatCalories } from '@/utils/format';
 
 interface MealsTableRowProps {
   meal: Meal;

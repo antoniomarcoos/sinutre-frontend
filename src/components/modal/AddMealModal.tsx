@@ -43,7 +43,7 @@ export function AddMealModal({
   const [items, setItems] = useState<FoodItem[]>(() => {
     if (editingMeal?.items) {
       return editingMeal.items.map((item) => ({
-        id: item.id || crypto.randomUUID(),
+        id: item.id || Date.now(),
         foodId: item.foodId,
         name: item.food?.name || '',
         grams: item.foodG || 0,
@@ -65,7 +65,7 @@ export function AddMealModal({
       });
       if (editingMeal.items) {
         setItems(editingMeal.items.map((item) => ({
-          id: item.id || crypto.randomUUID(),
+          id: item.id || Date.now(),
           foodId: item.foodId,
           name: item.food?.name || '',
           grams: item.foodG || 0,
