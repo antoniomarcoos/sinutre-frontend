@@ -13,6 +13,7 @@ import { api } from '@/lib/api';
 import { useMealModal } from '@/hooks/useMealModal';
 import { DeleteConfirmationModal } from '@/components/modal/DeleteConfirmationModal';
 import { ViewMealModal } from '@/components/modal/ViewMealModal';
+import { WaterCard } from '@/components/water/WaterCard';
 
 interface DashboardPageProps {
   drawerId: string;
@@ -160,6 +161,10 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6 items-stretch">
           <TotalMealsCard summary={mealsSummary} />
           <AddMealCard onSelectCategory={modal.openWith} />
+        </div>
+
+        <div className="col-span-1 lg:col-span-2">
+          <WaterCard />
         </div>
 
         <MealsTable 

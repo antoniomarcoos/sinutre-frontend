@@ -10,6 +10,7 @@ import { DashboardPage } from '@/pages/DashboardPage';
 import { ProtectedRoute } from './ProtectRoute';
 import { DietFoodPage } from '@/pages/DietFood';
 import { CalculadorasPage } from '@/pages/CalculadorasPage';
+import { ProgressPage } from '@/pages/ProgressPage';
 
 export function Router() {
   return (
@@ -35,6 +36,10 @@ export function Router() {
           <Route
             path="/calculadoras"
             element={<CalculadorasPage />}
+          />
+          <Route
+            path="/stats"
+            element={<ProgressPage />}
           />
         </Route>
 
