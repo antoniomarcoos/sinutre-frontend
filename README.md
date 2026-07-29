@@ -1,4 +1,3 @@
-```markdown
 # Nutridash
 
 Dashboard de nutrição em React, convertido a partir do protótipo HTML original
@@ -35,7 +34,7 @@ v5 como plugin) e a UI foi quebrada em componentes reutilizáveis.
 
 ## Estrutura
 
-src/
+```src/
 ├── components/
 │   ├── calculadoras/  # IMCCalculator, GastoCaloricoCalculator, CalculadoraNutricional
 │   ├── cards/         # AddMealCard, TotalMealsCard
@@ -58,7 +57,7 @@ src/
 ├── utils/             # funções auxiliares (format, date)
 ├── App.tsx
 └── main.tsx
-
+```
 ## Scripts
 
 ```bash
@@ -73,4 +72,3 @@ npm run preview # preview do build
 
 O tema customizado `sinutre` (paleta verde) está definido em
 `src/styles/theme.css` usando a sintaxe `@plugin 'daisyui/theme'` do daisyUI v5.
-```
