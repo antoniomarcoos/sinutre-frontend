@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash, Pencil } from '@phosphor-icons/react';
+import { Plus, Trash, Pencil, Star } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
 
 import { SimpleHeader } from '@/components/layout/SimpleHeader';
 import { AddFoodModal } from '@/components/modal/AddFoodModal';
 import { EditFoodModal } from '@/components/modal/EditFoodModal';
 
-import { getFoods } from '@/services/foodService';
-import { api } from '@/lib/api';
+import { getFoods, updateFood, deleteFood } from '@/services/foodService';
 import type { Food } from '@/types/food';
 import { formatMacro } from '@/utils/format';
 
@@ -53,7 +52,7 @@ export function DietFoodPage() {
     if (!foodToDelete) return;
     
     try {
-      await api.delete(`/foods/${foodToDelete}`);
+      await deleteFood(String(foodToDelete));
       toast.success('Alimento excluído com sucesso');
       loadFoods();
       closeDeleteModal();
@@ -63,9 +62,29 @@ export function DietFoodPage() {
     }
   }
 
+  async function handleToggleFavorite(food: Food) {
+    try {
+      await updateFood(String(food.id), {
+        isFavorite: !food.isFavorite,
+        name: food.name,
+        caloriesPer100g: food.caloriesPer100g,
+        carbsPer100g: food.carbsPer100g,
+        proteinPer100g: food.proteinPer100g,
+        fatPer100g: food.fatPer100g,
+      });
+      toast.success(food.isFavorite ? 'Removido dos favoritos' : 'Adicionado aos favoritos');
+      loadFoods();
+    } catch (error) {
+      toast.error('Erro ao atualizar favorito');
+      console.error(error);
+    }
+  }
+
   useEffect(() => {
     loadFoods();
   }, []);
+
+  const favoriteFoods = foods.filter(f => f.isFavorite);
 
   return (
     <div className="w-full max-w-[1200px] mx-auto">
@@ -73,6 +92,30 @@ export function DietFoodPage() {
         title="Dieta"
         subtitle="Gerencie seus alimentos"
       />
+
+      {favoriteFoods.length > 0 && (
+        <div className="mt-6 mb-4">
+          <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+            <Star size={20} className="text-yellow-500 fill-yellow-500" />
+            Favoritos
+          </h3>
+          <div className="grid gap-3">
+            {favoriteFoods.map((food) => (
+              <div key={food.id} className="card bg-base-100 shadow-sm p-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">{food.name}</span>
+                  <button
+                    onClick={() => handleToggleFavorite(food)}
+                    className="btn btn-ghost btn-xs btn-square text-yellow-500"
+                  >
+                    <Star size={18} weight="fill" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <p>Carregando...</p>
@@ -89,6 +132,12 @@ export function DietFoodPage() {
                     {food.name}
                   </h2>
                   <div className="flex gap-1">
+                    <button
+                      onClick={() => handleToggleFavorite(food)}
+                      className={`btn btn-ghost btn-sm btn-square ${food.isFavorite ? 'text-yellow-500' : 'text-base-content/30'}`}
+                    >
+                      <Star size={20} weight={food.isFavorite ? 'fill' : 'regular'} />
+                    </button>
                     <button
                       onClick={() => openEditModal(food)}
                       className="btn btn-ghost btn-sm btn-square text-blue-500 hover:bg-blue-50 hover:text-blue-700"

@@ -6,6 +6,7 @@ import { MacroStatsBar } from '@/components/macros/MacroStatsBar';
 import { MealFab } from '@/components/meals/MealFab';
 import { MealsList } from '@/components/meals/MealsList';
 import { MealsTable } from '@/components/meals/MealsTable';
+import { MealFilters } from '@/components/meals/MealFilters';
 import { AddMealModal } from '@/components/modal/AddMealModal';
 import { useAuth } from '@/context/AuthContext';
 import { Meal } from '@/types/mealSummary';
@@ -14,6 +15,7 @@ import { useMealModal } from '@/hooks/useMealModal';
 import { DeleteConfirmationModal } from '@/components/modal/DeleteConfirmationModal';
 import { ViewMealModal } from '@/components/modal/ViewMealModal';
 import { WaterCard } from '@/components/water/WaterCard';
+import { RefeicaoSugestao } from '@/components/ia/RefeicaoSugestao';
 
 interface DashboardPageProps {
   drawerId: string;
@@ -21,28 +23,42 @@ interface DashboardPageProps {
 
 export function DashboardPage({ drawerId }: DashboardPageProps) {
   const { user } = useAuth();
-  if (!user){
-    return <></>
-  }
-  const modal = useMealModal();
+  if (!user) return <></>;
 
+  const modal = useMealModal();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [modalType, setModalType] = useState<'view' | 'edit' | 'delete' | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [userGoals, setUserGoals] = useState({ caloriesGoal: 2000, waterGoal: 2000 });
 
-  async function loadMeals() {
+  async function loadMeals(filters?: { startDate: string; endDate: string; type: string }) {
     try {
-      const response = await api.get('/meals');
+      const params = new URLSearchParams();
+      if (filters?.startDate) params.append('startDate', filters.startDate);
+      if (filters?.endDate) params.append('endDate', filters.endDate);
+      if (filters?.type && filters.type !== 'todos') params.append('type', filters.type);
+
+      const response = await api.get(`/meals?${params.toString()}`);
       setMeals(response.data);
     } finally {
       setLoading(false);
     }
   }
 
+  async function loadUserGoals() {
+    try {
+      const response = await api.get('/user/goals');
+      setUserGoals(response.data);
+    } catch (error) {
+      console.error('Erro ao carregar metas:', error);
+    }
+  }
+
   useEffect(() => {
     loadMeals();
+    loadUserGoals();
   }, []);
 
   const handleView = (meal: Meal) => {
@@ -79,65 +95,63 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
     }
   };
 
+  function handleFilter(newFilters: { startDate: string; endDate: string; type: string }) {
+    loadMeals(newFilters);
+  }
+
+  function handleClearFilters() {
+    loadMeals({ startDate: '', endDate: '', type: 'todos' });
+  }
+
   const mealsSummary = useMemo(() => {
     const today = new Date();
-
     const total = meals.length;
-
     const todayCount = meals.filter((meal) => {
       const date = new Date(meal.eatTime);
-
       return (
         date.getDate() === today.getDate() &&
         date.getMonth() === today.getMonth() &&
         date.getFullYear() === today.getFullYear()
       );
     }).length;
-
     const monthCount = meals.filter((meal) => {
       const date = new Date(meal.eatTime);
-
       return (
         date.getMonth() === today.getMonth() &&
         date.getFullYear() === today.getFullYear()
       );
     }).length;
-
-    return {
-      total,
-      thisMonth: monthCount,
-      today: todayCount,
-    };
+    return { total, thisMonth: monthCount, today: todayCount };
   }, [meals]);
 
   const macroSummary = useMemo(() => {
     const today = new Date();
-    return meals.filter((meal) => {
-      const date = new Date(meal.eatTime);
-      return (
-        date.getDay() === today.getDay() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear()
+    return meals
+      .filter((meal) => {
+        const date = new Date(meal.eatTime);
+        return (
+          date.getDay() === today.getDay() &&
+          date.getMonth() === today.getMonth() &&
+          date.getFullYear() === today.getFullYear()
+        );
+      })
+      .reduce(
+        (acc, meal) => {
+          acc.carbs += meal.totals.carbs;
+          acc.proteins += meal.totals.proteins;
+          acc.fats += meal.totals.fats;
+          acc.calories += meal.totals.calories;
+          return acc;
+        },
+        {
+          carbs: 0,
+          proteins: 0,
+          fats: 0,
+          calories: 0,
+          caloriesGoal: userGoals.caloriesGoal || 2000,
+        }
       );
-    }).reduce(
-      (acc, meal) => {
-        acc.carbs += meal.totals.carbs;
-        acc.proteins += meal.totals.proteins;
-        acc.fats += meal.totals.fats;
-        acc.calories += meal.totals.calories;
-
-        return acc;
-      },
-      {
-        carbs: 0,
-        proteins: 0,
-        fats: 0,
-        calories: 0,
-
-        caloriesGoal: 1000,
-      },
-    );
-  }, [meals]);
+  }, [meals, userGoals]);
 
   if (loading) {
     return (
@@ -150,12 +164,7 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
   return (
     <>
       <div className="flex flex-col gap-6 w-full max-w-[1200px] mx-auto mb-8">
-        <Header
-          drawerId={drawerId}
-          userName={user.name}
-          avatarUrl={user.avatarUrl}
-        />
-
+        <Header drawerId={drawerId} userName={user.name} avatarUrl={user.avatarUrl} />
         <MacroStatsBar summary={macroSummary} />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6 items-stretch">
@@ -167,13 +176,19 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
           <WaterCard />
         </div>
 
-        <MealsTable 
+        <div className="col-span-1 lg:col-span-2">
+          <RefeicaoSugestao onSaved={loadMeals} />
+        </div>
+
+        <MealFilters onFilter={handleFilter} onClear={handleClearFilters} />
+
+        <MealsTable
           meals={meals}
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
-        <MealsList 
+        <MealsList
           meals={meals}
           onView={handleView}
           onEdit={handleEdit}
@@ -188,7 +203,7 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
         typeMeal={modal.selectedCategory}
         onClose={modal.close}
         onSave={modal.close}
-        onMealCreated={loadMeals}
+        onMealCreated={() => loadMeals()}
       />
 
       {modalType === 'delete' && selectedMeal && (
@@ -201,10 +216,7 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
       )}
 
       {modalType === 'view' && selectedMeal && (
-        <ViewMealModal
-          meal={selectedMeal}
-          onClose={closeModal}
-        />
+        <ViewMealModal meal={selectedMeal} onClose={closeModal} />
       )}
 
       {modalType === 'edit' && selectedMeal && (
@@ -216,7 +228,7 @@ export function DashboardPage({ drawerId }: DashboardPageProps) {
             loadMeals();
             closeModal();
           }}
-          onMealCreated={loadMeals}
+          onMealCreated={() => loadMeals()}
           editingMeal={selectedMeal}
         />
       )}

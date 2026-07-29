@@ -4,7 +4,7 @@ import { api } from '@/lib/api';
 
 export function WaterCard() {
   const [total, setTotal] = useState(0);
-  const [goal] = useState(2000);
+  const [goal, setGoal] = useState(2000);
   const [loading, setLoading] = useState(true);
   const [customAmount, setCustomAmount] = useState('');
 
@@ -12,6 +12,9 @@ export function WaterCard() {
     try {
       const response = await api.get('/water');
       setTotal(response.data.total);
+      
+      const goals = await api.get('/user/goals');
+      setGoal(goals.data.waterGoal || 2000);
     } catch (error) {
       console.error('Erro ao carregar água:', error);
     } finally {

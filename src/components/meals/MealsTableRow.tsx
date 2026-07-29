@@ -20,13 +20,14 @@ export function MealsTableRow({
   onDelete 
 }: MealsTableRowProps) {
   const category = MEAL_CATEGORY_BY_ID[meal.type];
+  const categoryLabel = category?.label || meal.type || 'Outra';
 
   return (
     <tr className="hover">
       <td className="text-center font-bold text-base-content/60">{displayId ?? meal.id}</td>
       <td className="font-medium">{meal.name}</td>
       <td className="font-medium">{formatDate(meal.eatTime)}</td>
-      <td className="font-semibold">{category.label}</td>
+      <td className="font-semibold">{categoryLabel}</td>
       <td>
         <span className="badge badge-primary badge-outline">
           {formatCalories(meal.totals.calories)} kcal

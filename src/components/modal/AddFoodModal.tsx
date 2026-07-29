@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { createFood, searchFoods } from '@/services/foodService';
 import type { Food } from '@/types/food';
@@ -21,6 +21,8 @@ export function AddFoodModal({
   const [suggestions, setSuggestions] = useState<Food[]>([]);
   const [query, setQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     if (query.length < 2) {
@@ -51,6 +53,7 @@ export function AddFoodModal({
     setSuggestions([]);
     setShowSuggestions(false);
     setQuery(food.name);
+    inputRef.current?.focus();
   }
 
   function handleNameChange(value: string) {
@@ -61,7 +64,10 @@ export function AddFoodModal({
     }
   }
 
-  function handleBlur() {
+  function handleBlur(e: React.FocusEvent) {
+    if (listRef.current && listRef.current.contains(e.relatedTarget as Node)) {
+      return;
+    }
     setTimeout(() => {
       setShowSuggestions(false);
     }, 200);
@@ -128,6 +134,7 @@ export function AddFoodModal({
         <div className="space-y-3 mt-4">
           <div className="relative">
             <input
+              ref={inputRef}
               className="input input-bordered w-full"
               placeholder="Nome"
               value={query || name}
@@ -136,7 +143,11 @@ export function AddFoodModal({
               onBlur={handleBlur}
             />
             {showSuggestions && suggestions.length > 0 && (
-              <ul className="absolute z-50 bg-base-100 border rounded-box shadow w-full mt-1 max-h-40 overflow-auto">
+              <ul
+                ref={listRef}
+                className="absolute z-50 bg-base-100 border rounded-box shadow w-full mt-1 max-h-40 overflow-auto"
+                onMouseDown={(e) => e.preventDefault()}
+              >
                 {suggestions.map((food) => (
                   <li
                     key={food.id}

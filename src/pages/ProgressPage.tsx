@@ -20,8 +20,16 @@ interface DailyStat {
   water: number;
 }
 
+interface WeightLog {
+  id: number;
+  weight: number;
+  height: number;
+  createdAt: string;
+}
+
 export function ProgressPage() {
   const [stats, setStats] = useState<DailyStat[]>([]);
+  const [weightHistory, setWeightHistory] = useState<WeightLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState('7');
 
@@ -39,8 +47,20 @@ export function ProgressPage() {
     }
   }
 
+  async function loadWeightHistory() {
+    try {
+      const response = await api.get('/stats/weight', {
+        params: { days },
+      });
+      setWeightHistory(response.data);
+    } catch (error) {
+      console.error('Erro ao carregar peso:', error);
+    }
+  }
+
   useEffect(() => {
     loadStats();
+    loadWeightHistory();
   }, [days]);
 
   function formatDate(dateStr: string) {
@@ -56,6 +76,11 @@ export function ProgressPage() {
   const chartData = stats.map(s => ({
     ...s,
     date: formatDate(s.date),
+  }));
+
+  const weightData = weightHistory.map(w => ({
+    date: formatDate(new Date(w.createdAt).toISOString().split('T')[0]),
+    peso: w.weight,
   }));
 
   return (
@@ -100,7 +125,7 @@ export function ProgressPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="card bg-base-100 shadow-sm p-4">
           <h4 className="font-semibold mb-2">Calorias por dia</h4>
           <ResponsiveContainer width="100%" height={200}>
@@ -126,6 +151,21 @@ export function ProgressPage() {
             </LineChart>
           </ResponsiveContainer>
         </div>
+
+        {weightData.length > 0 && (
+          <div className="card bg-base-100 shadow-sm p-4">
+            <h4 className="font-semibold mb-2">Evolução do peso (kg)</h4>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={weightData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis domain={['auto', 'auto']} />
+                <Tooltip formatter={(value) => [`${Number(value).toFixed(1)} kg`, 'Peso']} />
+                <Line type="monotone" dataKey="peso" stroke="#8b5cf6" strokeWidth={2} name="Peso" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       {loading ? (

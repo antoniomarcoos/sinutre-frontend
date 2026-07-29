@@ -8,6 +8,11 @@ export async function getFoods(search?: string) {
   return response.data;
 }
 
+export async function getFavoriteFoods() {
+  const response = await api.get<Food[]>('/foods/favorites');
+  return response.data;
+}
+
 export async function getAllFoods(search: string) {
   const response = await api.get<Food[]>('/foods/all', {
     params: { search },
@@ -31,7 +36,7 @@ export async function searchFoods(search: string) {
 
 export async function updateFood(
   id: string,
-  food: Omit<Food, 'id'>,
+  food: Partial<Omit<Food, 'id'>>,
 ) {
   const response = await api.put(`/foods/${id}`, food);
   return response.data;

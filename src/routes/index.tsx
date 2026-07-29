@@ -8,9 +8,10 @@ import { AppLayout } from '@/layouts/AppLayout';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { ProtectedRoute } from './ProtectRoute';
-import { DietFoodPage } from '@/pages/DietFood';
+import { DietFoodPage } from '@/pages/DietFoodPage';
 import { CalculadorasPage } from '@/pages/CalculadorasPage';
 import { ProgressPage } from '@/pages/ProgressPage';
+import { SettingsPage } from '@/pages/SettingsPage';
 
 export function Router() {
   return (
@@ -40,6 +41,10 @@ export function Router() {
           <Route
             path="/stats"
             element={<ProgressPage />}
+          />
+          <Route
+            path="/settings"
+            element={<SettingsPage />}
           />
         </Route>
 

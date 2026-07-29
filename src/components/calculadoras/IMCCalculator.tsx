@@ -1,14 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
-export function IMCCalculator() {
-  const [peso, setPeso] = useState('');
-  const [altura, setAltura] = useState('');
+interface IMCCalculatorProps {
+  defaultWeight?: string;
+  defaultHeight?: string;
+}
+
+export function IMCCalculator({ defaultWeight = '', defaultHeight = '' }: IMCCalculatorProps) {
+  const [peso, setPeso] = useState(defaultWeight);
+  const [altura, setAltura] = useState(defaultHeight);
   const [resultado, setResultado] = useState<{ imc: number; classificacao: string } | null>(null);
+
+  useEffect(() => {
+    if (defaultWeight) setPeso(defaultWeight);
+    if (defaultHeight) setAltura(defaultHeight);
+  }, [defaultWeight, defaultHeight]);
 
   function calcularIMC() {
     const pesoNum = Number(peso);
-    const alturaNum = Number(altura);
+    const alturaNum = Number(altura) / 100;
 
     if (!pesoNum || !alturaNum) {
       toast.error('Preencha todos os campos');
@@ -60,14 +70,14 @@ export function IMCCalculator() {
         </div>
 
         <div className="form-control">
-          <label className="label">Altura (m)</label>
+          <label className="label">Altura (cm)</label>
           <input
             type="number"
             className="input input-bordered"
-            placeholder="Ex: 1.75"
+            placeholder="Ex: 175"
             value={altura}
             onChange={(e) => setAltura(e.target.value)}
-            step="0.01"
+            step="0.1"
           />
         </div>
       </div>

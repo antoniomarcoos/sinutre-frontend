@@ -1,13 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
-export function GastoCaloricoCalculator() {
-  const [idade, setIdade] = useState('');
-  const [peso, setPeso] = useState('');
-  const [altura, setAltura] = useState('');
+interface GastoCaloricoCalculatorProps {
+  defaultWeight?: string;
+  defaultHeight?: string;
+  defaultAge?: string;
+}
+
+export function GastoCaloricoCalculator({ defaultWeight = '', defaultHeight = '', defaultAge = '' }: GastoCaloricoCalculatorProps) {
+  const [idade, setIdade] = useState(defaultAge);
+  const [peso, setPeso] = useState(defaultWeight);
+  const [altura, setAltura] = useState(defaultHeight);
   const [sexo, setSexo] = useState('masculino');
   const [atividade, setAtividade] = useState('1.2');
   const [resultado, setResultado] = useState<{ tmb: number; tdee: number } | null>(null);
+
+  useEffect(() => {
+    if (defaultWeight) setPeso(defaultWeight);
+    if (defaultHeight) setAltura(defaultHeight);
+    if (defaultAge) setIdade(defaultAge);
+  }, [defaultWeight, defaultHeight, defaultAge]);
 
   const fatoresAtividade = [
     { label: 'Sedentário', value: '1.2' },

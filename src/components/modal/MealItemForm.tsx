@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { FormField } from '../forms/FormField';
 import { FoodItem } from '@/types/meal';
 import { Food } from '@/types/food';
-import { getFoods } from '@/services/foodService';
+import { searchFoods } from '@/services/foodService';
 
 interface MealItemFormProps {
   onAdd: (item: FoodItem) => void;
@@ -49,7 +49,7 @@ export function MealItemForm({ onAdd }: MealItemFormProps) {
 
     const timeout = setTimeout(async () => {
       try {
-        const result = await getFoods(query);
+        const result = await searchFoods(query);
         setFoods(result);
       } catch (error) {
         console.error('Erro na busca:', error);

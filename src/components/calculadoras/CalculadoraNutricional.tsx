@@ -18,14 +18,44 @@ interface ItemSelecionado {
   fat: number;
 }
 
-export function CalculadoraNutricional() {
+interface Metas {
+  calorias: number;
+  proteinas: number;
+  carbos: number;
+  gorduras: number;
+}
+
+interface CalculadoraNutricionalProps {
+  defaultWeight?: string;
+  defaultHeight?: string;
+}
+
+export function CalculadoraNutricional({ defaultWeight = '', defaultHeight = '' }: CalculadoraNutricionalProps) {
   const [profile, setProfile] = useState('adulto');
-  const [peso, setPeso] = useState('');
-  const [altura, setAltura] = useState('');
+  const [peso, setPeso] = useState(defaultWeight);
+  const [altura, setAltura] = useState(defaultHeight);
+  const [imc, setImc] = useState('');
   const [search, setSearch] = useState('');
   const [suggestions, setSuggestions] = useState<Food[]>([]);
   const [items, setItems] = useState<ItemSelecionado[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  useEffect(() => {
+    if (defaultWeight) setPeso(defaultWeight);
+    if (defaultHeight) setAltura(defaultHeight);
+  }, [defaultWeight, defaultHeight]);
+
+  useEffect(() => {
+    const pesoNum = Number(peso);
+    const alturaNum = Number(altura);
+    if (pesoNum > 0 && alturaNum > 0) {
+      const alturaMetros = alturaNum / 100;
+      const imcCalculado = pesoNum / (alturaMetros * alturaMetros);
+      setImc(imcCalculado.toFixed(1));
+    } else {
+      setImc('');
+    }
+  }, [peso, altura]);
 
   const profiles = [
     { id: 'adulto', label: 'Adulto' },
@@ -33,6 +63,44 @@ export function CalculadoraNutricional() {
     { id: 'idoso', label: 'Idoso' },
     { id: 'crianca', label: 'Criança' },
   ];
+
+  function calcularMetas(): Metas {
+    const pesoNum = Number(peso) || 70;
+    const alturaNum = Number(altura) || 175;
+
+    switch (profile) {
+      case 'atleta':
+        return {
+          calorias: Math.round(pesoNum * 35),
+          proteinas: Math.round(pesoNum * 2.2),
+          carbos: Math.round(pesoNum * 5),
+          gorduras: Math.round(pesoNum * 1.2),
+        };
+      case 'idoso':
+        return {
+          calorias: Math.round(pesoNum * 25),
+          proteinas: Math.round(pesoNum * 1.2),
+          carbos: Math.round(pesoNum * 3),
+          gorduras: Math.round(pesoNum * 0.8),
+        };
+      case 'crianca':
+        return {
+          calorias: Math.round(pesoNum * 30),
+          proteinas: Math.round(pesoNum * 1.0),
+          carbos: Math.round(pesoNum * 4),
+          gorduras: Math.round(pesoNum * 0.8),
+        };
+      default:
+        return {
+          calorias: Math.round(pesoNum * 28),
+          proteinas: Math.round(pesoNum * 1.6),
+          carbos: Math.round(pesoNum * 4),
+          gorduras: Math.round(pesoNum * 1.0),
+        };
+    }
+  }
+
+  const metas = calcularMetas();
 
   useEffect(() => {
     if (search.length < 2) {
@@ -112,6 +180,11 @@ export function CalculadoraNutricional() {
     setSearch('');
     setSuggestions([]);
     setShowSuggestions(false);
+  }
+
+  function getProfileLabel() {
+    const p = profiles.find(p => p.id === profile);
+    return p ? p.label : 'Adulto';
   }
 
   async function exportarPDF() {
@@ -274,7 +347,11 @@ export function CalculadoraNutricional() {
         </button>
       </div>
 
-      <div className="flex gap-4 mb-6">
+      <div className="text-sm text-base-content/60 mb-4">
+        Metas para {getProfileLabel()} · personalizadas pelo seu peso e altura
+      </div>
+
+      <div className="flex flex-wrap items-end gap-4 mb-6">
         <div className="form-control w-32">
           <label className="label text-xs">Peso (kg)</label>
           <input
@@ -295,6 +372,12 @@ export function CalculadoraNutricional() {
             onChange={(e) => setAltura(e.target.value)}
           />
         </div>
+        {imc && (
+          <div className="form-control">
+            <label className="label text-xs">IMC</label>
+            <div className="text-lg font-bold text-primary">{imc}</div>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -409,12 +492,12 @@ export function CalculadoraNutricional() {
               <div>
                 <div className="flex justify-between text-sm">
                   <span>Calorias</span>
-                  <span>{Math.round(totals.calories)} / 2000</span>
+                  <span>{Math.round(totals.calories)} / {metas.calorias}</span>
                 </div>
                 <div className="w-full bg-base-300 rounded-full h-2 mt-1">
                   <div
                     className="bg-primary h-2 rounded-full"
-                    style={{ width: `${Math.min((totals.calories / 2000) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((totals.calories / metas.calorias) * 100, 100)}%` }}
                   />
                 </div>
               </div>
@@ -422,12 +505,12 @@ export function CalculadoraNutricional() {
               <div>
                 <div className="flex justify-between text-sm">
                   <span>Proteína</span>
-                  <span>{formatMacro(totals.protein)} / 75g</span>
+                  <span>{formatMacro(totals.protein)} / {metas.proteinas}g</span>
                 </div>
                 <div className="w-full bg-base-300 rounded-full h-2 mt-1">
                   <div
                     className="bg-blue-500 h-2 rounded-full"
-                    style={{ width: `${Math.min((totals.protein / 75) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((totals.protein / metas.proteinas) * 100, 100)}%` }}
                   />
                 </div>
               </div>
@@ -435,12 +518,12 @@ export function CalculadoraNutricional() {
               <div>
                 <div className="flex justify-between text-sm">
                   <span>Carbos</span>
-                  <span>{formatMacro(totals.carbs)} / 200g</span>
+                  <span>{formatMacro(totals.carbs)} / {metas.carbos}g</span>
                 </div>
                 <div className="w-full bg-base-300 rounded-full h-2 mt-1">
                   <div
                     className="bg-yellow-500 h-2 rounded-full"
-                    style={{ width: `${Math.min((totals.carbs / 200) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((totals.carbs / metas.carbos) * 100, 100)}%` }}
                   />
                 </div>
               </div>
@@ -448,12 +531,12 @@ export function CalculadoraNutricional() {
               <div>
                 <div className="flex justify-between text-sm">
                   <span>Gordura</span>
-                  <span>{formatMacro(totals.fat)} / 55g</span>
+                  <span>{formatMacro(totals.fat)} / {metas.gorduras}g</span>
                 </div>
                 <div className="w-full bg-base-300 rounded-full h-2 mt-1">
                   <div
                     className="bg-red-500 h-2 rounded-full"
-                    style={{ width: `${Math.min((totals.fat / 55) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((totals.fat / metas.gorduras) * 100, 100)}%` }}
                   />
                 </div>
               </div>
