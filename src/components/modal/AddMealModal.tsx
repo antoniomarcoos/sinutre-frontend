@@ -46,11 +46,11 @@ export function AddMealModal({
         id: item.id || Date.now(),
         foodId: item.foodId,
         name: item.food?.name || '',
-        grams: item.foodG || 0,
-        calories: item.calories || 0,
-        carbs: item.carbs || 0,
-        protein: item.protein || 0,
-        fat: item.fat || 0,
+        grams: item.grams || 0,
+        calories: item.food ? (item.food.caloriesPer100g * item.grams) / 100 : 0,
+        carbs: item.food ? (item.food.carbsPer100g * item.grams) / 100 : 0,
+        protein: item.food ? (item.food.proteinPer100g * item.grams) / 100 : 0,
+        fat: item.food ? (item.food.fatPer100g * item.grams) / 100 : 0,
       }));
     }
     return [];
@@ -68,11 +68,11 @@ export function AddMealModal({
           id: item.id || Date.now(),
           foodId: item.foodId,
           name: item.food?.name || '',
-          grams: item.foodG || 0,
-          calories: item.calories || 0,
-          carbs: item.carbs || 0,
-          protein: item.protein || 0,
-          fat: item.fat || 0,
+          grams: item.grams || 0,
+          calories: item.food ? (item.food.caloriesPer100g * item.grams) / 100 : 0,
+          carbs: item.food ? (item.food.carbsPer100g * item.grams) / 100 : 0,
+          protein: item.food ? (item.food.proteinPer100g * item.grams) / 100 : 0,
+          fat: item.food ? (item.food.fatPer100g * item.grams) / 100 : 0,
         })));
       }
     }
@@ -107,7 +107,7 @@ export function AddMealModal({
 
     try {
       if (editingMeal) {
-        await updateMeal(editingMeal.id, data);
+        await updateMeal(String(editingMeal.id), data);
       } else {
         await createMeal(data);
       }
