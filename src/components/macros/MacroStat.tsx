@@ -1,6 +1,6 @@
 interface MacroStatProps {
   label: string;
-  value: number;
+  value: number | string;
   unit: string;
   variant?: 'default' | 'highlight' | 'danger';
   goal?: number;
@@ -22,7 +22,7 @@ export function MacroStat({
     ? 'stat text-center bg-primary text-primary-content border-none shadow-md'
     : (isDanger) ? 'stat text-center bg-red-700 text-white border-none shadow-md' : 'stat text-center lg:border-r border-base-200';
   
-    const valueMutedClass = isHighlight
+  const valueMutedClass = isHighlight
     ? 'opacity-70'
     : (isDanger) ? 'text-white' : 'text-base-content/60';
 
@@ -37,7 +37,7 @@ export function MacroStat({
   return (
     <div className={wrapperClasses}>
       <div className="stat-value text-2xl lg:text-4xl mb-1">
-        {value}
+        {typeof value === 'number' ? value.toFixed(1) : value}
         {goal !== undefined ? (
           <span className={`text-sm lg:text-xl font-normal ${valueMutedClass}`}>
             {' '}/ {goal}
